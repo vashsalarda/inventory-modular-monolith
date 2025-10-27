@@ -21,9 +21,9 @@ type service struct {
 }
 
 var (
-	host = os.Getenv("BLUEPRINT_DB_HOST")
-	port = os.Getenv("BLUEPRINT_DB_PORT")
-	//database = os.Getenv("BLUEPRINT_DB_DATABASE")
+	host = os.Getenv("DB_HOST")
+	port = os.Getenv("DB_PORT")
+	//database = os.Getenv("DB_DATABASE")
 )
 
 func New() Service {
@@ -50,4 +50,34 @@ func (s *service) Health() map[string]string {
 	return map[string]string{
 		"message": "It's healthy",
 	}
+}
+
+type MongoDB struct {
+	Client   *mongo.Client
+	Database *mongo.Database
+}
+
+func NewMongoDB(uri, dbName string) (*MongoDB, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
+	if err != nil {
+		return nil, err
+	}
+
+	if err := client.Ping(ctx, nil); err != nil {
+		return nil, err
+	}
+
+	return &MongoDB{
+		Client:   client,
+		Database: client.Database(dbName),
+	}, nil
+}
+
+func (m *MongoDB) Disconnect() error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	return m.Client.Disconnect(ctx)
 }

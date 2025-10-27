@@ -14,20 +14,24 @@ func mustStartMongoContainer() (func(context.Context) error, error) {
 		return nil, err
 	}
 
+	teardown := func(ctx context.Context) error {
+		return dbContainer.Terminate(ctx)
+	}
+
 	dbHost, err := dbContainer.Host(context.Background())
 	if err != nil {
-		return dbContainer.Terminate, err
+		return teardown, err
 	}
 
 	dbPort, err := dbContainer.MappedPort(context.Background(), "27017/tcp")
 	if err != nil {
-		return dbContainer.Terminate, err
+		return teardown, err
 	}
 
 	host = dbHost
 	port = dbPort.Port()
 
-	return dbContainer.Terminate, err
+	return teardown, nil
 }
 
 func TestMain(m *testing.M) {
