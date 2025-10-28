@@ -13,6 +13,7 @@ import (
 	"inventory-modular-monolith/internal/config"
 	"inventory-modular-monolith/internal/database"
 	"inventory-modular-monolith/internal/modules/inventory"
+	"inventory-modular-monolith/internal/modules/merchant"
 	"inventory-modular-monolith/internal/server"
 
 	"github.com/gofiber/fiber/v2"
@@ -79,7 +80,7 @@ func main() {
 	// Register modules
 	inventory.RegisterRoutes(v1, db)
 	// pos.RegisterRoutes(v1, db)
-	// merchant.RegisterRoutes(v1, db)
+	merchant.RegisterRoutes(v1, db)
 
 	log.Println("Current Time:", time.Now().Format("Jan 02, 2006 03:04 AM"))
 
