@@ -27,7 +27,9 @@ var (
 )
 
 func New() Service {
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s", host, port)))
+	db_uri := fmt.Sprintf("mongodb://%s:%s", host, port)
+	log.Printf("Connecting to MongoDB at %s", db_uri)
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(db_uri))
 
 	if err != nil {
 		log.Fatal(err)
