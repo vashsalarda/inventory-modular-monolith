@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 
 	"inventory-modular-monolith/internal/modules/merchant/domain"
@@ -39,7 +41,16 @@ func (h *StoreHandler) GetStore(c *fiber.Ctx) error {
 }
 
 func (h *StoreHandler) GetAllStores(c *fiber.Ctx) error {
-	stores, err := h.service.GetAllStores(c.Context())
+	var page, page_size int64 = 1, 25
+	if p, err := strconv.ParseInt(c.Query("page_number", "1"), 10, 64); err == nil {
+		page = p
+	}
+	if ps, err := strconv.ParseInt(c.Query("page_size", "10"), 10, 64); err == nil {
+		page_size = ps
+	}
+	keyword := c.Query("keyword", "")
+
+	stores, err := h.service.GetAllStores(c.Context(), keyword, page, page_size)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}

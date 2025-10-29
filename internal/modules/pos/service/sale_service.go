@@ -84,10 +84,10 @@ func (s *SaleService) CreateSale(ctx context.Context, dto *domain.CreateSaleDTO)
 	return sale, nil
 }
 
-func (s *SaleService) GetSalesByStore(ctx context.Context, storeID string) ([]domain.Sale, error) {
+func (s *SaleService) GetSalesByStore(ctx context.Context, storeID string, keyword string , page int64, page_size int64) (*domain.SalePage, error) {
 	objID, err := primitive.ObjectIDFromHex(storeID)
 	if err != nil {
 		return nil, errors.New("invalid store ID")
 	}
-	return s.repo.FindByStoreID(ctx, objID)
+	return s.repo.FindByStoreID(ctx, objID, keyword, page, page_size)
 }

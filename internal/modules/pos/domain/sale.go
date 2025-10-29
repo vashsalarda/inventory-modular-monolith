@@ -28,12 +28,21 @@ type Sale struct {
 }
 
 type CreateSaleDTO struct {
-	StoreID     string             `json:"store_id" validate:"required"`
-	Items       []SaleItemDTO      `json:"items" validate:"required,min=1"`
-	PaymentType string             `json:"payment_type" validate:"required"`
+	StoreID     string        `json:"store_id" validate:"required"`
+	Items       []SaleItemDTO `json:"items" validate:"required,min=1"`
+	PaymentType string        `json:"payment_type" validate:"required"`
 }
 
 type SaleItemDTO struct {
-	ProductID string  `json:"product_id" validate:"required"`
-	Quantity  int     `json:"quantity" validate:"required,gt=0"`
+	ProductID string `json:"product_id" validate:"required"`
+	Quantity  int    `json:"quantity" validate:"required,gt=0"`
+}
+
+type SalePage struct {
+	PageSize   int64  `json:"page_size,omitempty"`
+	PageNumber int64  `json:"page_number,omitempty"`
+	TotalRows  int64  `json:"total_rows,omitempty"`
+	Total      int64  `json:"total"`
+	TotalPages int64  `json:"total_pages,omitempty"`
+	Data       []Sale `json:"data,omitempty"`
 }

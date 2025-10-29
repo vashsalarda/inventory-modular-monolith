@@ -31,3 +31,12 @@ type CreateStoreDTO struct {
 	Phone   string  `json:"phone" validate:"required"`
 	Address Address `json:"address" validate:"required"`
 }
+
+type StorePage struct {
+	PageSize   int64   `json:"page_size,omitempty"`
+	PageNumber int64   `json:"page_number,omitempty"`
+	TotalRows  int64   `json:"total_rows,omitempty"`
+	Total      int64   `json:"total"`
+	TotalPages int64   `json:"total_pages,omitempty"`
+	Data       []Store `json:"data,omitempty"`
+}

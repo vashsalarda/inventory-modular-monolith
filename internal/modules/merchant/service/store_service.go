@@ -41,6 +41,6 @@ func (s *StoreService) GetStore(ctx context.Context, id string) (*domain.Store, 
 	return s.repo.FindByID(ctx, objID)
 }
 
-func (s *StoreService) GetAllStores(ctx context.Context) ([]domain.Store, error) {
-	return s.repo.FindAll(ctx)
+func (s *StoreService) GetAllStores(ctx context.Context, keyword string , page int64, page_size int64) (domain.StorePage, error) {
+	return s.repo.FindAll(ctx, keyword, page, page_size)
 }
