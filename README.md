@@ -167,6 +167,6 @@ Install deps:
 
 Run: 
 
-```go run cmd/api/main.go```
+```go run cmd/api/main.go``` or ```go run ./cmd/api .```
 
 The implementation includes complete CRUD operations, proper error handling, graceful shutdown, and example API requests in the README!
