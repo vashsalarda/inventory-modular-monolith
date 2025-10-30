@@ -146,16 +146,14 @@ Example: When a sale is created, the POS module:
 3. Creates the sale
 4. Updates product quantities
 
-## Future Enhancements
+## Future Updates
 
-- Add authentication & authorization
-- Implement event-driven communication between modules
-- Add reporting module
+- Add unit tests
+- Add authentication
+- Add report module
+- Add Event-driven communication between modules
 - Implement CQRS pattern for complex queries
 - Add caching layer (Redis)
-- Implement unit tests and integration tests
-- Add API documentation (Swagger/OpenAPI)
-- Implement pagination for list endpoints
 
 ## Quick Start
 
