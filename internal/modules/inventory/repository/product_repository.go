@@ -99,18 +99,61 @@ func (r *ProductRepository) FindByID(ctx context.Context, id primitive.ObjectID)
 	return &product, nil
 }
 
-func (r *ProductRepository) FindByStoreID(ctx context.Context, storeID primitive.ObjectID) ([]domain.Product, error) {
-	cursor, err := r.collection.Find(ctx, bson.M{"store_id": storeID})
+func (r *ProductRepository) FindByStoreID(ctx context.Context, storeID primitive.ObjectID, keyword string, page int64, page_size int64) (*domain.ProductPage, error) {
+	filter := bson.M{
+		"store_id": storeID,
+		"deleted": bson.M{
+			"$ne": true,
+		},
+	}
+
+	if keyword != "" {
+		filter["$or"] = bson.A{
+			bson.M{"name": bson.M{"$regex": keyword, "$options": "i"}},
+			bson.M{"sku": bson.M{"$regex": keyword, "$options": "i"}},
+			bson.M{"description": bson.M{"$regex": keyword, "$options": "i"}},
+		}
+	}
+
+	docs := make([]domain.Product, 0, page_size)
+
+	totalItems, err := r.collection.CountDocuments(context.TODO(), filter)
+	if err != nil {
+		return nil, err
+	}
+
+	// Calculate total pages
+	totalPages := int64(math.Ceil(float64(totalItems) / float64(page_size)))
+
+	// Calculate skip
+	skip := (page - 1) * page_size
+
+	// Find options with limit and skip
+	findOptions := options.Find()
+	findOptions.SetLimit(page_size)
+	findOptions.SetSkip(skip)
+	findOptions.SetSort(bson.D{{Key: "created_at", Value: -1}})
+
+	cursor, err := r.collection.Find(context.TODO(), filter, findOptions)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	var products []domain.Product
-	if err := cursor.All(ctx, &products); err != nil {
+	if err := cursor.All(ctx, &docs); err != nil {
 		return nil, err
 	}
-	return products, nil
+
+	resp := &domain.ProductPage{
+		TotalRows:  totalItems,
+		TotalPages: totalPages,
+		Total:      totalItems,
+		PageNumber: page,
+		PageSize:   page_size,
+		Data:       docs,
+	}
+
+	return resp, nil
 }
 
 func (r *ProductRepository) Update(ctx context.Context, id primitive.ObjectID, update bson.M) error {

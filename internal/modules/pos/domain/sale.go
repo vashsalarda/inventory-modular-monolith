@@ -39,10 +39,10 @@ type SaleItemDTO struct {
 }
 
 type SalePage struct {
-	PageSize   int64  `json:"page_size,omitempty"`
-	PageNumber int64  `json:"page_number,omitempty"`
-	TotalRows  int64  `json:"total_rows,omitempty"`
+	PageSize   int64  `json:"page_size"`
+	PageNumber int64  `json:"page_number"`
+	TotalRows  int64  `json:"total_rows"`
 	Total      int64  `json:"total"`
-	TotalPages int64  `json:"total_pages,omitempty"`
-	Data       []Sale `json:"data,omitempty"`
+	TotalPages int64  `json:"total_pages"`
+	Data       []Sale `json:"data"`
 }

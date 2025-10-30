@@ -53,12 +53,12 @@ func (s *ProductService) GetProduct(ctx context.Context, id string) (*domain.Pro
 	return s.repo.FindByID(ctx, objID)
 }
 
-func (s *ProductService) GetProductsByStore(ctx context.Context, storeID string) ([]domain.Product, error) {
+func (s *ProductService) GetProductsByStore(ctx context.Context, storeID string, keyword string, page int64, page_size int64) (*domain.ProductPage, error) {
 	objID, err := primitive.ObjectIDFromHex(storeID)
 	if err != nil {
 		return nil, errors.New("invalid store ID")
 	}
-	return s.repo.FindByStoreID(ctx, objID)
+	return s.repo.FindByStoreID(ctx, objID, keyword, page, page_size)
 }
 
 func (s *ProductService) DeductStock(ctx context.Context, productID primitive.ObjectID, quantity int) error {

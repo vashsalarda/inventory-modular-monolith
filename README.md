@@ -34,9 +34,9 @@ inventory-api/
 
 ## Setup
 
-1. Install dependencies:
+1. Manage dependencies:
 ```bash
-go mod download
+go mod tidy
 ```
 
 2. Set up MongoDB:
@@ -44,16 +44,16 @@ go mod download
 docker run -d -p 27017:27017 --name mongodb mongo:latest
 ```
 
-3. Configure environment variables:
-```bash
-cp .env.example .env
-```
+3. Configure environment variables in ```.env```
 
 4. Run the application:
 ```bash
-go run cmd/api/main.go
+go run cmd/api/main.go 
 ```
-
+ or 
+```bash
+go run ./cmd/api .
+```
 ## API Endpoints
 
 ### Merchant/Store Management
@@ -62,6 +62,7 @@ go run cmd/api/main.go
 - `GET /api/v1/merchants/stores/:id` - Get store by ID
 
 ### Inventory Management
+- `GET /api/v1/inventory/products` - List of products
 - `POST /api/v1/inventory/products` - Create a new product
 - `GET /api/v1/inventory/products/:id` - Get product by ID
 - `GET /api/v1/inventory/stores/:storeId/products` - Get all products for a store
@@ -153,20 +154,4 @@ Example: When a sale is created, the POS module:
 - Add report module
 - Add Event-driven communication between modules
 - Implement CQRS pattern for complex queries
-- Add caching layer (Redis)
-
-## Quick Start
-
-Run MongoDB: 
-
-```docker run -d -p 27017:27017 mongo:latest```
-
-Install deps: 
-
-```go mod download```
-
-Run: 
-
-```go run cmd/api/main.go``` or ```go run ./cmd/api .```
-
-The implementation includes complete CRUD operations, proper error handling, graceful shutdown, and example API requests in the README!
+- Add caching (Redis or In-Memory Caching)

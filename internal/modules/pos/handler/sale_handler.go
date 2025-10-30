@@ -5,16 +5,18 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
+	store_service "inventory-modular-monolith/internal/modules/merchant/service"
 	"inventory-modular-monolith/internal/modules/pos/domain"
 	"inventory-modular-monolith/internal/modules/pos/service"
 )
 
 type SaleHandler struct {
 	service *service.SaleService
+	store_service *store_service.StoreService
 }
 
-func NewSaleHandler(service *service.SaleService) *SaleHandler {
-	return &SaleHandler{service: service}
+func NewSaleHandler(service *service.SaleService, store_service *store_service.StoreService) *SaleHandler {
+	return &SaleHandler{service: service, store_service: store_service}
 }
 
 func (h *SaleHandler) CreateSale(c *fiber.Ctx) error {
@@ -33,6 +35,10 @@ func (h *SaleHandler) CreateSale(c *fiber.Ctx) error {
 
 func (h *SaleHandler) GetSalesByStore(c *fiber.Ctx) error {
 	storeID := c.Params("storeId")
+	_, err := h.store_service.GetStore(c.Context(), storeID)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "Store not found"})
+	}
 	var page, page_size int64 = 1, 25
 	if p, err := strconv.ParseInt(c.Query("page_number", "1"), 10, 64); err == nil {
 		page = p
@@ -41,9 +47,9 @@ func (h *SaleHandler) GetSalesByStore(c *fiber.Ctx) error {
 		page_size = ps
 	}
 	keyword := c.Query("keyword", "")
-	sales, err := h.service.GetSalesByStore(c.Context(), storeID, keyword, page, page_size)
+	res, err := h.service.GetSalesByStore(c.Context(), storeID, keyword, page, page_size)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
-	return c.JSON(sales)
+	return c.JSON(res)
 }

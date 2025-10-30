@@ -35,6 +35,7 @@ func (r *SaleRepository) Create(ctx context.Context, sale *domain.Sale) error {
 
 func (r *SaleRepository) FindByStoreID(ctx context.Context, storeID primitive.ObjectID, keyword string , page int64, page_size int64) (*domain.SalePage, error) {
 	filter := bson.M{
+		"store_id": storeID,
 		"deleted": bson.M{
 			"$ne": true,
 		},
