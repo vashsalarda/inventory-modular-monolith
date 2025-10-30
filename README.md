@@ -1,53 +1,174 @@
-# Project inventory-modular-monolith
+# Inventory API - Modular Monolith
 
-One Paragraph of project description goes here
+A modular monolith implementation of an Inventory Management System with POS and Merchant modules.
 
-## Getting Started
+## Architecture
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+This project follows a **Modular Monolith** architecture pattern with clear module boundaries:
 
-## MakeFile
+### Modules:
+1. **Inventory Module** - Manages products and stock
+2. **POS Module** - Handles sales transactions
+3. **Merchant Module** - Manages stores and merchants
 
-Run build make command with tests
-```bash
-make all
+### Structure:
+```
+inventory-api/
+├── cmd/api/              # Application entry point
+├── internal/
+│   ├── config/           # Config
+│   ├── database/         # Database
+│   ├── server/           # Server and routes
+│   └── modules/          # Business modules
+│       ├── inventory/    # Product management
+│       ├── pos/          # Point of Sale
+│       └── merchant/     # Store management
 ```
 
-Build the application
+### Layer Architecture (per module):
+- **Domain**: Business entities and DTOs
+- **Repository**: Data access layer
+- **Service**: Business logic
+- **Handler**: HTTP handlers
+- **Routes**: Route registration
+
+## Setup
+
+1. Install dependencies:
 ```bash
-make build
+go mod download
 ```
 
-Run the application
+2. Set up MongoDB:
 ```bash
-make run
-```
-Create DB container
-```bash
-make docker-run
+docker run -d -p 27017:27017 --name mongodb mongo:latest
 ```
 
-Shutdown DB Container
+3. Configure environment variables:
 ```bash
-make docker-down
+cp .env.example .env
 ```
 
-DB Integrations Test:
+4. Run the application:
 ```bash
-make itest
+go run cmd/api/main.go
 ```
 
-Live reload the application:
+## API Endpoints
+
+### Merchant/Store Management
+- `POST /api/v1/merchants/stores` - Create a new store
+- `GET /api/v1/merchants/stores` - Get all stores
+- `GET /api/v1/merchants/stores/:id` - Get store by ID
+
+### Inventory Management
+- `POST /api/v1/inventory/products` - Create a new product
+- `GET /api/v1/inventory/products/:id` - Get product by ID
+- `GET /api/v1/inventory/stores/:storeId/products` - Get all products for a store
+
+### POS (Point of Sale)
+- `POST /api/v1/pos/sales` - Create a new sale transaction
+- `GET /api/v1/pos/stores/:storeId/sales` - Get all sales for a store
+
+## Example Requests
+
+### Create Store
 ```bash
-make watch
+curl -X POST http://localhost:3000/api/v1/merchants/stores \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Main Store",
+    "email": "main@store.com",
+    "phone": "+1234567890",
+    "address": {
+      "street": "123 Main St",
+      "city": "New York",
+      "state": "NY",
+      "zip_code": "10001",
+      "country": "USA"
+    }
+  }'
 ```
 
-Run the test suite:
+### Create Product
 ```bash
-make test
+curl -X POST http://localhost:3000/api/v1/inventory/products \
+  -H "Content-Type: application/json" \
+  -d '{
+    "store_id": "65f1234567890abcdef12345",
+    "sku": "PROD-001",
+    "name": "Laptop",
+    "description": "High-performance laptop",
+    "price": 1299.99,
+    "cost": 899.99,
+    "quantity": 50,
+    "category": "Electronics"
+  }'
 ```
 
-Clean up binary from the last build:
+### Create Sale
 ```bash
-make clean
+curl -X POST http://localhost:3000/api/v1/pos/sales \
+  -H "Content-Type: application/json" \
+  -d '{
+    "store_id": "65f1234567890abcdef12345",
+    "payment_type": "cash",
+    "items": [
+      {
+        "product_id": "65f1234567890abcdef12346",
+        "quantity": 2
+      }
+    ]
+  }'
 ```
+
+## Key Features
+
+✅ **Modular Architecture**: Clear separation of concerns with independent modules
+✅ **Domain-Driven Design**: Each module has its own domain, repository, service, and handler layers
+✅ **MongoDB Integration**: Using official MongoDB Go driver
+✅ **Clean Architecture**: Dependencies point inward (handler → service → repository)
+✅ **Inter-module Communication**: POS module communicates with Inventory module through repositories
+✅ **Graceful Shutdown**: Proper cleanup of resources
+✅ **Stock Management**: Automatic inventory deduction on sales
+✅ **Transaction Safety**: Sales validate stock before completing
+
+## Module Communication
+
+Modules can communicate through:
+1. **Repository Layer**: Direct repository calls (e.g., POS accessing Product repository)
+2. **Service Layer**: Service-to-service calls for complex operations
+3. **Events**: (Can be added for async operations)
+
+Example: When a sale is created, the POS module:
+1. Validates products exist (via Inventory repository)
+2. Checks stock availability
+3. Creates the sale
+4. Updates product quantities
+
+## Future Enhancements
+
+- Add authentication & authorization
+- Implement event-driven communication between modules
+- Add reporting module
+- Implement CQRS pattern for complex queries
+- Add caching layer (Redis)
+- Implement unit tests and integration tests
+- Add API documentation (Swagger/OpenAPI)
+- Implement pagination for list endpoints
+
+## Quick Start
+
+Run MongoDB: 
+
+```docker run -d -p 27017:27017 mongo:latest```
+
+Install deps: 
+
+```go mod download```
+
+Run: 
+
+```go run cmd/api/main.go```
+
+The implementation includes complete CRUD operations, proper error handling, graceful shutdown, and example API requests in the README!
