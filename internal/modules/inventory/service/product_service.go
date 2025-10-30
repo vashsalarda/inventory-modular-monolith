@@ -41,8 +41,8 @@ func (s *ProductService) CreateProduct(ctx context.Context, dto *domain.CreatePr
 	return product, nil
 }
 
-func (s *ProductService) GetAllProducts(ctx context.Context) ([]domain.Product, error) {
-	return s.repo.FindAll(ctx)
+func (s *ProductService) GetAllProducts(ctx context.Context, keyword string, page int64, page_size int64) (*domain.ProductPage, error) {
+	return s.repo.FindAll(ctx, keyword, page, page_size)
 }
 
 func (s *ProductService) GetProduct(ctx context.Context, id string) (*domain.Product, error) {
@@ -66,10 +66,10 @@ func (s *ProductService) DeductStock(ctx context.Context, productID primitive.Ob
 	if err != nil {
 		return err
 	}
-	
+
 	if product.Quantity < quantity {
 		return errors.New("insufficient stock")
 	}
-	
+
 	return s.repo.UpdateQuantity(ctx, productID, product.Quantity-quantity)
 }

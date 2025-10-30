@@ -30,3 +30,12 @@ type CreateProductDTO struct {
 	Quantity    int     `json:"quantity" validate:"required,gte=0"`
 	Category    string  `json:"category"`
 }
+
+type ProductPage struct {
+	PageSize   int64     `json:"page_size"`
+	PageNumber int64     `json:"page_number"`
+	TotalRows  int64     `json:"total_rows"`
+	Total      int64     `json:"total"`
+	TotalPages int64     `json:"total_pages"`
+	Data       []Product `json:"data"`
+}
